@@ -34,27 +34,47 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   };
   
   return (
-    <div className="flex justify-between items-center mb-6 p-4 bg-white dark:bg-gray-800 shadow-md rounded-lg">
-      <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+    <div 
+      className={`flex justify-between items-center mb-6 p-4 shadow-md rounded-lg ${
+        currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}
+    >
+      <h2 
+        className={`text-2xl font-semibold ${
+          currentTheme === 'dark' ? 'text-gray-200' : 'text-gray-800'
+        }`}
+      >
         {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
       </h2>
       <div className="flex gap-3">
         <button 
           onClick={onPrevMonth}
-          className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-sm"
+          className={`px-4 py-2 rounded-lg transition-colors shadow-sm ${
+            currentTheme === 'dark' 
+              ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          }`}
           aria-label="Previous month"
         >
           &lt;
         </button>
         <button 
           onClick={handleTodayClick}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors shadow-sm"
+          className={`px-4 py-2 rounded-lg transition-colors shadow-sm ${
+            currentTheme === 'dark' 
+              ? 'hover:bg-blue-700' 
+              : 'hover:bg-blue-600'
+          } bg-blue-500 text-white`}
         >
           Today
         </button>
         <button 
           onClick={onNextMonth}
-          className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-sm"
+          className={`px-4 py-2 rounded-lg transition-colors shadow-sm ${
+            currentTheme === 'dark' 
+              ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          }`}
           aria-label="Next month"
         >
           &gt;

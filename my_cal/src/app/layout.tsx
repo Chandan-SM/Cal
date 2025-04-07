@@ -2,7 +2,6 @@
 // app/layout.tsx
 import "./globals.css";
 import { ThemeProvider } from "../contexts/ThemeContext";
-import { useEffect, useState } from "react";
 
 // export const metadata = {
 //   title: 'My Cal',
