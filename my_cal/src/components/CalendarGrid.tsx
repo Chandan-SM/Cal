@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+// components/CalendarGrid.tsx
+import React from 'react';
 import DayCell from './DayCell';
-import { useTheme } from 'next-themes';
 
 export interface Event {
   id: number;
@@ -24,15 +24,6 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   onDateClick, 
   onEventClick 
 }) => {
-  const { resolvedTheme } = useTheme();
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  const currentTheme = isMounted ? resolvedTheme : "system";
-
   const getDaysInMonth = (year: number, month: number): number => {
     return new Date(year, month + 1, 0).getDate();
   };
@@ -45,6 +36,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     day: number | null;
     date: Date | null;
     events?: Event[];
+    isCurrentMonth: boolean;
   }
 
   const generateCalendarDays = (): DayData[] => {
@@ -53,51 +45,104 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
 
     const daysInMonth = getDaysInMonth(year, month);
     const firstDayOfMonth = getFirstDayOfMonth(year, month);
-
-    const days: DayData[] = [];
-
-    for (let i = 0; i < firstDayOfMonth; i++) {
-      days.push({ day: null, date: null });
+    
+    // Get days from previous month
+    const prevMonthDays: DayData[] = [];
+    if (firstDayOfMonth > 0) {
+      const prevMonth = month === 0 ? 11 : month - 1;
+      const prevMonthYear = month === 0 ? year - 1 : year;
+      const daysInPrevMonth = getDaysInMonth(prevMonthYear, prevMonth);
+      
+      for (let i = 0; i < firstDayOfMonth; i++) {
+        const day = daysInPrevMonth - firstDayOfMonth + i + 1;
+        const date = new Date(prevMonthYear, prevMonth, day);
+        const dayEvents = events.filter(event => {
+          const eventDate = new Date(event.date);
+          return eventDate.getDate() === day && 
+                 eventDate.getMonth() === prevMonth && 
+                 eventDate.getFullYear() === prevMonthYear;
+        });
+        
+        prevMonthDays.push({ 
+          day, 
+          date, 
+          events: dayEvents,
+          isCurrentMonth: false 
+        });
+      }
     }
-
+    
+    // Current month days
+    const currentMonthDays: DayData[] = [];
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
       const dayEvents = events.filter(event => {
         const eventDate = new Date(event.date);
-        return eventDate.getDate() === day &&
-               eventDate.getMonth() === month &&
+        return eventDate.getDate() === day && 
+               eventDate.getMonth() === month && 
                eventDate.getFullYear() === year;
       });
-
-      days.push({ day, date, events: dayEvents });
+      
+      currentMonthDays.push({ 
+        day, 
+        date, 
+        events: dayEvents,
+        isCurrentMonth: true
+      });
     }
-
-    return days;
+    
+    // Next month days to fill calendar grid
+    const totalDaysDisplayed = prevMonthDays.length + currentMonthDays.length;
+    const daysNeeded = 42 - totalDaysDisplayed; // 6 rows of 7 days
+    
+    const nextMonthDays: DayData[] = [];
+    if (daysNeeded > 0) {
+      const nextMonth = month === 11 ? 0 : month + 1;
+      const nextMonthYear = month === 11 ? year + 1 : year;
+      
+      for (let day = 1; day <= daysNeeded; day++) {
+        const date = new Date(nextMonthYear, nextMonth, day);
+        const dayEvents = events.filter(event => {
+          const eventDate = new Date(event.date);
+          return eventDate.getDate() === day && 
+                 eventDate.getMonth() === nextMonth && 
+                 eventDate.getFullYear() === nextMonthYear;
+        });
+        
+        nextMonthDays.push({ 
+          day, 
+          date, 
+          events: dayEvents,
+          isCurrentMonth: false 
+        });
+      }
+    }
+    
+    return [...prevMonthDays, ...currentMonthDays, ...nextMonthDays];
   };
 
   const calendarDays = generateCalendarDays();
-  const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const weekdays = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
 
   return (
-    <div className={`calendar-grid p-4 rounded-lg shadow-md ${currentTheme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-white text-gray-800'}`}>
+    <div className="calendar-grid">
       {/* Weekday headers */}
-      <div className="grid grid-cols-7 mb-2">
+      <div className="grid grid-cols-7 mb-4">
         {weekdays.map(day => (
-          <div key={day} className="text-center font-semibold uppercase text-sm">
+          <div key={day} className="text-center font-medium text-gray-400 text-xs tracking-wider py-2">
             {day}
           </div>
         ))}
       </div>
 
       {/* Calendar grid */}
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-2">
         {calendarDays.map((dayData, index) => (
           <DayCell
             key={index}
             dayData={dayData}
             onDateClick={onDateClick}
             onEventClick={onEventClick}
-            isCurrentMonth={true}
           />
         ))}
       </div>

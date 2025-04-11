@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import CalendarHeader from './CalendarHeader';
 import CalendarGrid from './CalendarGrid';
+import EventSidebar from './EventSideBar';
 import EventModal from './EventModal';
 
 // Define types for our events and props
@@ -29,10 +30,14 @@ const Calendar: React.FC = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
   };
   
+  const handleTodayClick = (): void => {
+    setCurrentDate(new Date());
+  };
+  
   const handleDateClick = (date: Date): void => {
     setSelectedDate(date);
     setShowModal(true);
-    setSelectedEvent(null); // Reset selected event when selecting a new date
+    setSelectedEvent(null);
   };
   
   const handleEventClick = (event: Event): void => {
@@ -52,9 +57,9 @@ const Calendar: React.FC = () => {
     } else {
       // Add new event
       const newEvent: Event = {
-        id: Date.now(), // Simple ID generation
+        id: Date.now(),
         ...eventData,
-        date: selectedDate as Date // We know selectedDate is not null here because the modal is open
+        date: selectedDate as Date
       };
       setEvents([...events, newEvent]);
     }
@@ -67,11 +72,13 @@ const Calendar: React.FC = () => {
   };
   
   return (
-    <div className="calendar-container">
+    <div className="flex w-full h-full">
+      <div className="flex-2 p-8 overflow-auto">
       <CalendarHeader 
         currentDate={currentDate}
         onPrevMonth={prevMonth}
         onNextMonth={nextMonth}
+        onTodayClick={handleTodayClick}
       />
       <CalendarGrid 
         currentDate={currentDate}
@@ -79,14 +86,24 @@ const Calendar: React.FC = () => {
         onDateClick={handleDateClick}
         onEventClick={handleEventClick}
       />
-      {showModal && selectedDate && (
-        <EventModal
-          date={selectedDate}
-          event={selectedEvent}
-          onSave={handleSaveEvent}
-          onDelete={handleDeleteEvent}
-          onClose={() => setShowModal(false)}
+      </div>
+      
+      <div className="hidden lg:block h-[100vh] lg:w-[250px] xl:w-[300px]">
+        <EventSidebar
+          events={events}
+          currentDate={currentDate}
+          onEventClick={handleEventClick}
         />
+      </div>
+      
+      {showModal && selectedDate && (
+      <EventModal
+        date={selectedDate}
+        event={selectedEvent}
+        onSave={handleSaveEvent}
+        onDelete={handleDeleteEvent}
+        onClose={() => setShowModal(false)}
+      />
       )}
     </div>
   );

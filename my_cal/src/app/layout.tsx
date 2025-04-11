@@ -1,12 +1,6 @@
-"use client";
 // app/layout.tsx
+"use client";
 import "./globals.css";
-import { ThemeProvider } from "../contexts/ThemeContext";
-
-// export const metadata = {
-//   title: 'My Cal',
-//   description: 'A calendar application',
-// };
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -14,14 +8,9 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="h-[100vh]">
-        <ThemeProvider
-        attribute={"class"}
-        defaultTheme={"system"}
-        enableSystem>
-          {children}
-        </ThemeProvider>
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body className="h-screen bg-gray-900 text-gray-100">
+        {children}
       </body>
     </html>
   );

@@ -2,48 +2,48 @@
 import React from 'react';
 import EventItem from './EventItem';
 import { Event } from './CalendarGrid';
+import { isToday } from '../lib/calendarUtils';
 
 interface DayData {
   day: number | null;
   date: Date | null;
   events?: Event[];
+  isCurrentMonth: boolean;
 }
 
 interface DayCellProps {
   dayData: DayData;
   onDateClick: (date: Date) => void;
   onEventClick: (event: Event) => void;
-  isCurrentMonth: boolean;
 }
 
 const DayCell: React.FC<DayCellProps> = ({ 
   dayData, 
   onDateClick, 
-  onEventClick, 
-  isCurrentMonth 
+  onEventClick
 }) => {
   if (!dayData.day || !dayData.date) {
-    return <div className="h-24 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-sm"></div>;
+    return <div className="h-24 bg-gray-800 rounded-md"></div>;
   }
   
-  const isToday = new Date().toDateString() === dayData.date.toDateString();
+  const today = isToday(dayData.date);
   
   return (
     <div 
-      className={`h-24 p-2 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm 
-        ${isToday ? 'bg-blue-50 dark:bg-blue-900/40' : 'bg-white dark:bg-gray-800'} 
-        ${!isCurrentMonth ? 'text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-gray-100'}
-        hover:bg-blue-100 dark:hover:bg-blue-800 cursor-pointer transition-all duration-200`}
+      className={`md:h-32 lg:h-26 p-2 border border-gray-800 rounded-md flex md:flex-col lg:flex-row gap-2 overflow-hidden
+        ${dayData.isCurrentMonth ? 'bg-gray-800' : 'bg-gray-800/20'}
+        ${today && 'border-red-500'}
+        hover:bg-gray-700 cursor-pointer transition-colors`}
       onClick={() => onDateClick(dayData.date as Date)}
     >
-      <div className="flex justify-between items-center">
-        <span className={`inline-block rounded-full w-8 h-8 text-center leading-8 font-semibold 
-          ${isToday ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-300'}`}>
+      <div className="flex justify-between h-fit">
+        <span className={`text-sm font-medium ${dayData.isCurrentMonth ? 'text-gray-300' : 'text-gray-500'}`}>
           {dayData.day}
         </span>
       </div>
-      <div className="mt-2 overflow-y-auto max-h-16 space-y-1">
-        {dayData.events && dayData.events.map(event => (
+      
+      <div className="md:w-[100%] lg:w-[80%] space-y-1">
+        {dayData.events && dayData.events.slice(0, 2).map(event => (
           <EventItem 
             key={event.id} 
             event={event} 
@@ -53,6 +53,11 @@ const DayCell: React.FC<DayCellProps> = ({
             }} 
           />
         ))}
+        {dayData.events && dayData.events.length > 2 && (
+          <div className="text-xs text-gray-400 mt-1">
+            +{dayData.events.length - 2} more
+          </div>
+        )}
       </div>
     </div>
   );
