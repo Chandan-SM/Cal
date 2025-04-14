@@ -5,7 +5,7 @@ export interface EventData {
   id?: number;
   title: string;
   description?: string;
-  eventDate: string; // Format: 'YYYY-MM-DD'
+  eventDate: string;
   time?: string;
   category?: string;
 }
