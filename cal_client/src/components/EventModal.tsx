@@ -9,6 +9,7 @@ interface EventModalProps {
   onSave: (eventData: Omit<Event, 'id' | 'date'>) => void;
   onDelete: (eventId: number) => void;
   onClose: () => void;
+  isLoading?: boolean;
 }
 
 const EventModal: React.FC<EventModalProps> = ({ 
@@ -16,7 +17,8 @@ const EventModal: React.FC<EventModalProps> = ({
   event, 
   onSave, 
   onDelete, 
-  onClose 
+  onClose,
+  isLoading = false
 }) => {
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
@@ -29,6 +31,12 @@ const EventModal: React.FC<EventModalProps> = ({
       setDescription(event.description || '');
       setCategory(event.category || 'other');
       setTime(event.time || '12:00');
+    } else {
+      // Reset form for new events
+      setTitle('');
+      setDescription('');
+      setCategory('other');
+      setTime('12:00');
     }
   }, [event]);
   
@@ -60,6 +68,7 @@ const EventModal: React.FC<EventModalProps> = ({
               className="w-full bg-gray-700 border border-gray-600 text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
               placeholder="Event title"
+              disabled={isLoading}
             />
           </div>
           
@@ -70,6 +79,7 @@ const EventModal: React.FC<EventModalProps> = ({
               value={time}
               onChange={(e) => setTime(e.target.value)}
               className="w-full bg-gray-700 border border-gray-600 text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              disabled={isLoading}
             />
           </div>
           
@@ -79,6 +89,7 @@ const EventModal: React.FC<EventModalProps> = ({
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               className="w-full bg-gray-700 border border-gray-600 text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              disabled={isLoading}
             >
               <option value="work">Work</option>
               <option value="personal">Personal</option>
@@ -95,6 +106,7 @@ const EventModal: React.FC<EventModalProps> = ({
               className="w-full bg-gray-700 border border-gray-600 text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               rows={4}
               placeholder="Event description"
+              disabled={isLoading}
             />
           </div>
           
@@ -104,9 +116,10 @@ const EventModal: React.FC<EventModalProps> = ({
                 <button
                   type="button"
                   onClick={() => onDelete(event.id)}
-                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors disabled:bg-red-800 disabled:cursor-not-allowed"
+                  disabled={isLoading}
                 >
-                  Delete
+                  {isLoading ? 'Deleting...' : 'Delete'}
                 </button>
               )}
             </div>
@@ -114,15 +127,17 @@ const EventModal: React.FC<EventModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="bg-gray-700 hover:bg-gray-600 text-gray-300 px-4 py-2 rounded-lg transition-colors"
+                className="bg-gray-700 hover:bg-gray-600 text-gray-300 px-4 py-2 rounded-lg transition-colors disabled:bg-gray-800 disabled:cursor-not-allowed"
+                disabled={isLoading}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors disabled:bg-indigo-800 disabled:cursor-not-allowed"
+                disabled={isLoading}
               >
-                Save
+                {isLoading ? 'Saving...' : 'Save'}
               </button>
             </div>
           </div>

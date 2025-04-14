@@ -33,11 +33,11 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           >
             MONTH
           </button>
-          <button 
+          {/* <button 
             className="px-5 py-2 bg-transparent text-white font-medium opacity-50"
           >
             YEAR
-          </button>
+          </button> */}
         </div>
         
         <div className="flex space-x-2">

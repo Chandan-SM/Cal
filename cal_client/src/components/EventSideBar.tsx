@@ -23,8 +23,17 @@ const EventSidebar: React.FC<EventSidebarProps> = ({
         eventDate.getFullYear() === currentDate.getFullYear()
       );
     })
-    .sort((a, b) => a.date.getTime() - b.date.getTime())
-    .slice(0, 5); // Limit to 5 events
+    .sort((a, b) => {
+      const dateComparison = a.date.getTime() - b.date.getTime();
+      if (dateComparison !== 0) {
+        return dateComparison;
+      }
+      // If dates are the same, compare by time
+      const timeA = a.time ? new Date(`1970-01-01T${a.time}`).getTime() : 0;
+      const timeB = b.time ? new Date(`1970-01-01T${b.time}`).getTime() : 0;
+      return timeA - timeB;
+    });
+    // .slice(0, 9); // Limit to 5 events
 
   const getEventColor = (category?: string): string => {
     const colors: Record<string, string> = {
@@ -38,7 +47,7 @@ const EventSidebar: React.FC<EventSidebarProps> = ({
   };
 
   return (
-    <div className="w-[100%] bg-gray-800 p-4 border-l border-gray-700 overflow-y-auto h-[100vh]">
+    <div className="w-[100%] bg-gray-800 p-4 border-l border-gray-700 overflow-y-auto h-[100vh] scrollbar-none">
       {currentMonthEvents.some((event) => {
         const eventDate = new Date(event.date);
         const today = new Date();
