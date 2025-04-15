@@ -8,14 +8,19 @@ export interface EventData {
   eventDate: string;
   time?: string;
   category?: string;
+  userId?: string;
 }
 
-export async function fetchEvents() {
+export async function fetchEvents(userId?: string) {
   try {
     if (!API) {
       throw new Error('API endpoint is not defined');
     }
-    const res = await fetch(API);
+    
+    // If userID is provided, fetch only that user's events
+    const url = userId ? `${API}/user/${userId}` : API;
+    const res = await fetch(url);
+    
     if (!res.ok) {
       throw new Error(`Failed to fetch events: ${res.status}`);
     }

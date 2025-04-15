@@ -10,6 +10,7 @@ import {
   updateEvent,
   deleteEvent,
 } from "@/services/CalendarService";
+import { useAuth } from "@clerk/nextjs";
 
 // Define types for our events and props
 export interface Event {
@@ -38,6 +39,7 @@ const Calendar: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { userId } = useAuth();
 
   // Format a date to 'YYYY-MM-DD' for the backend
   const formatDateForBackend = (date: Date): string => {
@@ -64,9 +66,15 @@ const Calendar: React.FC = () => {
   const loadEvents = async () => {
     setIsLoading(true);
     try {
-      const data = await fetchEvents();
-      const convertedEvents = data.map(convertBackendEvent);
-      setEvents(convertedEvents);
+      // Only fetch events if we have a userId
+      if (userId) {
+        const data = await fetchEvents(userId);
+        const convertedEvents = data.map(convertBackendEvent);
+        setEvents(convertedEvents);
+      } else {
+        // Handle case where user is not authenticated
+        setEvents([]);
+      }
     } catch (error) {
       console.error("Failed to fetch events:", error);
       // You might want to show an error toast or notification here
@@ -76,8 +84,10 @@ const Calendar: React.FC = () => {
   };
 
   useEffect(() => {
-    loadEvents();
-  }, []);
+    if (userId) {
+      loadEvents();
+    }
+  }, [userId]);
 
   const prevMonth = (): void => {
     setCurrentDate(
@@ -115,17 +125,19 @@ const Calendar: React.FC = () => {
   const handleSaveEvent = async (
     eventData: Omit<Event, "id" | "date">
   ): Promise<void> => {
-    if (!selectedDate) return;
+    if (!selectedDate || !userId) return console.log("User ID is missing"); // Check if selectedDate exists
+    ; // Check if userId exists
 
     setIsLoading(true);
     try {
-      // Prepare data for backend
+      // Prepare data for backend with userID
       const backendEventData = {
         title: eventData.title,
         description: eventData.description,
         eventDate: formatDateForBackend(selectedDate),
         time: eventData.time,
         category: eventData.category,
+        userId: userId, // Include the userId with lowercase id to match backend
       };
 
       if (selectedEvent) {

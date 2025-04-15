@@ -58,7 +58,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
             onClick={onTodayClick}
             className="px-5 py-2 bg-indigo-600 text-white font-medium"
           >
-            MONTH
+            TODAY
           </button>
           {/* <button 
             className="px-5 py-2 bg-transparent text-white font-medium opacity-50"
