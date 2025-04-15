@@ -1,10 +1,15 @@
 // components/Calendar.tsx
-import React, { useEffect, useState } from 'react';
-import CalendarHeader from './CalendarHeader';
-import CalendarGrid from './CalendarGrid';
-import EventSidebar from './EventSideBar';
-import EventModal from './EventModal';
-import { fetchEvents, createEvent, updateEvent, deleteEvent } from '@/services/CalendarService';
+import React, { useEffect, useState } from "react";
+import CalendarHeader from "./CalendarHeader";
+import CalendarGrid from "./CalendarGrid";
+import EventSidebar from "./EventSideBar";
+import EventModal from "./EventModal";
+import {
+  fetchEvents,
+  createEvent,
+  updateEvent,
+  deleteEvent,
+} from "@/services/CalendarService";
 
 // Define types for our events and props
 export interface Event {
@@ -38,8 +43,8 @@ const Calendar: React.FC = () => {
   const formatDateForBackend = (date: Date): string => {
     // Format as YYYY-MM-DD with padding for single-digit months/days
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // +1 because months are 0-indexed
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // +1 because months are 0-indexed
+    const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
@@ -51,7 +56,7 @@ const Calendar: React.FC = () => {
       description: backendEvent.description,
       date: new Date(backendEvent.eventDate),
       time: backendEvent.time,
-      category: backendEvent.category
+      category: backendEvent.category,
     };
   };
 
@@ -63,7 +68,7 @@ const Calendar: React.FC = () => {
       const convertedEvents = data.map(convertBackendEvent);
       setEvents(convertedEvents);
     } catch (error) {
-      console.error('Failed to fetch events:', error);
+      console.error("Failed to fetch events:", error);
       // You might want to show an error toast or notification here
     } finally {
       setIsLoading(false);
@@ -73,35 +78,45 @@ const Calendar: React.FC = () => {
   useEffect(() => {
     loadEvents();
   }, []);
-  
+
   const prevMonth = (): void => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
+    );
   };
-  
+
   const nextMonth = (): void => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
+    );
   };
-  
+
   const handleTodayClick = (): void => {
     setCurrentDate(new Date());
   };
-  
+
   const handleDateClick = (date: Date): void => {
-    const cleanDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const cleanDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
     setSelectedDate(cleanDate);
     setShowModal(true);
     setSelectedEvent(null);
   };
-  
+
   const handleEventClick = (event: Event): void => {
     setSelectedEvent(event);
     setSelectedDate(new Date(event.date));
     setShowModal(true);
   };
-  
-  const handleSaveEvent = async (eventData: Omit<Event, 'id' | 'date'>): Promise<void> => {
+
+  const handleSaveEvent = async (
+    eventData: Omit<Event, "id" | "date">
+  ): Promise<void> => {
     if (!selectedDate) return;
-    
+
     setIsLoading(true);
     try {
       // Prepare data for backend
@@ -110,72 +125,59 @@ const Calendar: React.FC = () => {
         description: eventData.description,
         eventDate: formatDateForBackend(selectedDate),
         time: eventData.time,
-        category: eventData.category
+        category: eventData.category,
       };
-      
+
       if (selectedEvent) {
         // Update existing event
         const updatedBackendEvent = await updateEvent(selectedEvent.id, {
           id: selectedEvent.id,
-          ...backendEventData
+          ...backendEventData,
         });
-        
+
         // Convert to frontend format and update state
         const updatedEvent = convertBackendEvent(updatedBackendEvent);
-        setEvents(events.map(event => 
-          event.id === selectedEvent.id ? updatedEvent : event
-        ));
+        setEvents(
+          events.map((event) =>
+            event.id === selectedEvent.id ? updatedEvent : event
+          )
+        );
       } else {
         // Create new event
         const newBackendEvent = await createEvent(backendEventData);
-        
+
         // Convert to frontend format and update state
         const newEvent = convertBackendEvent(newBackendEvent);
         setEvents([...events, newEvent]);
       }
-      
+
       // Close modal after successful operation
       setShowModal(false);
     } catch (error) {
-      console.error('Error saving event:', error);
+      console.error("Error saving event:", error);
       // Show error notification
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   const handleDeleteEvent = async (eventId: number): Promise<void> => {
     setIsLoading(true);
     try {
       await deleteEvent(eventId);
       // Remove from local state after successful deletion
-      setEvents(events.filter(event => event.id !== eventId));
+      setEvents(events.filter((event) => event.id !== eventId));
       setShowModal(false);
     } catch (error) {
-      console.error('Error deleting event:', error);
+      console.error("Error deleting event:", error);
       // Show error notification
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   return (
     <div className="flex w-full h-full">
-      <div className="flex-2 p-8 overflow-auto">
-        <CalendarHeader 
-          currentDate={currentDate}
-          onPrevMonth={prevMonth}
-          onNextMonth={nextMonth}
-          onTodayClick={handleTodayClick}
-        />
-        <CalendarGrid 
-          currentDate={currentDate}
-          events={events}
-          onDateClick={handleDateClick}
-          onEventClick={handleEventClick}
-        />
-      </div>
-      
       <div className="hidden lg:block h-[100vh] lg:w-[250px] xl:w-[300px] scrollbar-none">
         <EventSidebar
           events={events}
@@ -183,7 +185,22 @@ const Calendar: React.FC = () => {
           onEventClick={handleEventClick}
         />
       </div>
-      
+
+      <div className="flex-2 p-8 overflow-auto">
+        <CalendarHeader
+          currentDate={currentDate}
+          onPrevMonth={prevMonth}
+          onNextMonth={nextMonth}
+          onTodayClick={handleTodayClick}
+        />
+        <CalendarGrid
+          currentDate={currentDate}
+          events={events}
+          onDateClick={handleDateClick}
+          onEventClick={handleEventClick}
+        />
+      </div>
+
       {showModal && selectedDate && (
         <EventModal
           date={selectedDate}
