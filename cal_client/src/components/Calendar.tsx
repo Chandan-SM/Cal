@@ -1,5 +1,6 @@
 // components/Calendar.tsx
 import React, { useEffect, useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 import CalendarHeader from "./CalendarHeader";
 import CalendarGrid from "./CalendarGrid";
 import EventSidebar from "./EventSideBar";
@@ -10,7 +11,6 @@ import {
   updateEvent,
   deleteEvent,
 } from "@/services/CalendarService";
-import { useAuth } from "@clerk/nextjs";
 
 // Define types for our events and props
 export interface Event {
@@ -20,6 +20,7 @@ export interface Event {
   date: Date;
   time?: string;
   category?: string;
+  isLocal?: boolean; // Flag to identify local events
 }
 
 // Interface for backend event data
@@ -30,27 +31,27 @@ interface BackendEvent {
   eventDate: string;
   time?: string;
   category?: string;
+  userId?: string;
 }
 
 const Calendar: React.FC = () => {
+  const { userId, isSignedIn } = useAuth();
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
+  const [localEvents, setLocalEvents] = useState<Event[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { userId } = useAuth();
-
-  // Format a date to 'YYYY-MM-DD' for the backend
+  
+  // Helper functions remain the same
   const formatDateForBackend = (date: Date): string => {
-    // Format as YYYY-MM-DD with padding for single-digit months/days
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // +1 because months are 0-indexed
+    const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
-  // Convert backend event format to frontend event format
   const convertBackendEvent = (backendEvent: BackendEvent): Event => {
     return {
       id: backendEvent.id,
@@ -59,36 +60,75 @@ const Calendar: React.FC = () => {
       date: new Date(backendEvent.eventDate),
       time: backendEvent.time,
       category: backendEvent.category,
+      isLocal: false,
     };
   };
 
-  // Load events from the API
-  const loadEvents = async () => {
+  // Load remote events only for authenticated users
+  const loadRemoteEvents = async () => {
+    if (!userId) return;
+    
     setIsLoading(true);
     try {
-      // Only fetch events if we have a userId
-      if (userId) {
-        const data = await fetchEvents(userId);
-        const convertedEvents = data.map(convertBackendEvent);
-        setEvents(convertedEvents);
-      } else {
-        // Handle case where user is not authenticated
-        setEvents([]);
-      }
+      const data = await fetchEvents(userId);
+      const convertedEvents = data.map(convertBackendEvent);
+      setEvents(convertedEvents);
     } catch (error) {
       console.error("Failed to fetch events:", error);
-      // You might want to show an error toast or notification here
     } finally {
       setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (userId) {
-      loadEvents();
+  // Load local events from localStorage
+  const loadLocalEvents = () => {
+    try {
+      const storedEvents = localStorage.getItem('calendarEvents');
+      if (storedEvents) {
+        const parsedEvents = JSON.parse(storedEvents);
+        // Convert string dates back to Date objects
+        const hydratedEvents = parsedEvents.map((event: Event) => ({
+          ...event,
+          date: new Date(event.date),
+          isLocal: true
+        }));
+        setLocalEvents(hydratedEvents);
+      }
+    } catch (error) {
+      console.error("Failed to load local events:", error);
     }
-  }, [userId]);
+  };
 
+  // Save local events to localStorage
+  const saveLocalEvents = (updatedEvents: Event[]) => {
+    try {
+      localStorage.setItem('calendarEvents', JSON.stringify(updatedEvents));
+    } catch (error) {
+      console.error("Failed to save local events:", error);
+    }
+  };
+
+  // Combined events from both sources
+  const allEvents = [...events, ...localEvents];
+
+  useEffect(() => {
+    // Load local events for all users
+    loadLocalEvents();
+    
+    // Load remote events only for authenticated users
+    if (isSignedIn) {
+      loadRemoteEvents();
+    }
+  }, [isSignedIn, userId]);
+
+  // Save localEvents to localStorage whenever they change
+  useEffect(() => {
+    if (localEvents.length > 0) {
+      saveLocalEvents(localEvents);
+    }
+  }, [localEvents]);
+
+  // Navigation functions remain the same
   const prevMonth = (): void => {
     setCurrentDate(
       new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
@@ -122,67 +162,108 @@ const Calendar: React.FC = () => {
     setShowModal(true);
   };
 
+  // Updated to handle both local and remote events
   const handleSaveEvent = async (
     eventData: Omit<Event, "id" | "date">
   ): Promise<void> => {
-    if (!selectedDate || !userId) return console.log("User ID is missing"); // Check if selectedDate exists
-    ; // Check if userId exists
+    if (!selectedDate) return;
 
     setIsLoading(true);
     try {
-      // Prepare data for backend with userID
-      const backendEventData = {
-        title: eventData.title,
-        description: eventData.description,
-        eventDate: formatDateForBackend(selectedDate),
-        time: eventData.time,
-        category: eventData.category,
-        userId: userId, // Include the userId with lowercase id to match backend
-      };
+      // If user is signed in, save to the server
+      if (isSignedIn && userId) {
+        const backendEventData = {
+          title: eventData.title,
+          description: eventData.description,
+          eventDate: formatDateForBackend(selectedDate),
+          time: eventData.time,
+          category: eventData.category,
+          userID: userId,
+        };
 
-      if (selectedEvent) {
-        // Update existing event
-        const updatedBackendEvent = await updateEvent(selectedEvent.id, {
-          id: selectedEvent.id,
-          ...backendEventData,
-        });
+        if (selectedEvent && !selectedEvent.isLocal) {
+          // Update existing remote event
+          const updatedBackendEvent = await updateEvent(selectedEvent.id, {
+            id: selectedEvent.id,
+            ...backendEventData,
+          });
 
-        // Convert to frontend format and update state
-        const updatedEvent = convertBackendEvent(updatedBackendEvent);
-        setEvents(
-          events.map((event) =>
-            event.id === selectedEvent.id ? updatedEvent : event
-          )
-        );
+          const updatedEvent = convertBackendEvent(updatedBackendEvent);
+          setEvents(
+            events.map((event) =>
+              event.id === selectedEvent.id ? updatedEvent : event
+            )
+          );
+        } else {
+          // Create new remote event
+          const newBackendEvent = await createEvent(backendEventData);
+          const newEvent = convertBackendEvent(newBackendEvent);
+          setEvents([...events, newEvent]);
+          
+          // If we're updating a local event, remove it from local storage
+          if (selectedEvent && selectedEvent.isLocal) {
+            const filteredLocalEvents = localEvents.filter(
+              event => event.id !== selectedEvent.id
+            );
+            setLocalEvents(filteredLocalEvents);
+            saveLocalEvents(filteredLocalEvents);
+          }
+        }
       } else {
-        // Create new event
-        const newBackendEvent = await createEvent(backendEventData);
+        // For non-authenticated users or local edits, save to localStorage
+        const newLocalEvent: Event = {
+          id: selectedEvent?.id || Date.now(), // Use timestamp as ID for new local events
+          title: eventData.title,
+          description: eventData.description,
+          date: selectedDate,
+          time: eventData.time,
+          category: eventData.category,
+          isLocal: true,
+        };
 
-        // Convert to frontend format and update state
-        const newEvent = convertBackendEvent(newBackendEvent);
-        setEvents([...events, newEvent]);
+        if (selectedEvent && selectedEvent.isLocal) {
+          // Update existing local event
+          const updatedLocalEvents = localEvents.map(event => 
+            event.id === selectedEvent.id ? newLocalEvent : event
+          );
+          setLocalEvents(updatedLocalEvents);
+          saveLocalEvents(updatedLocalEvents);
+        } else {
+          // Create new local event
+          setLocalEvents([...localEvents, newLocalEvent]);
+          saveLocalEvents([...localEvents, newLocalEvent]);
+        }
       }
 
-      // Close modal after successful operation
       setShowModal(false);
     } catch (error) {
       console.error("Error saving event:", error);
-      // Show error notification
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Updated to handle both local and remote events
   const handleDeleteEvent = async (eventId: number): Promise<void> => {
     setIsLoading(true);
     try {
-      await deleteEvent(eventId);
-      // Remove from local state after successful deletion
-      setEvents(events.filter((event) => event.id !== eventId));
+      // Check if it's a local event
+      const eventToDelete = allEvents.find(event => event.id === eventId);
+      
+      if (eventToDelete?.isLocal) {
+        // Delete from local storage
+        const updatedLocalEvents = localEvents.filter(event => event.id !== eventId);
+        setLocalEvents(updatedLocalEvents);
+        saveLocalEvents(updatedLocalEvents);
+      } else {
+        // Delete from server
+        await deleteEvent(eventId);
+        setEvents(events.filter(event => event.id !== eventId));
+      }
+      
       setShowModal(false);
     } catch (error) {
       console.error("Error deleting event:", error);
-      // Show error notification
     } finally {
       setIsLoading(false);
     }
@@ -192,7 +273,7 @@ const Calendar: React.FC = () => {
     <div className="flex w-full h-full">
       <div className="hidden lg:block h-[100vh] lg:w-[250px] xl:w-[300px] scrollbar-none">
         <EventSidebar
-          events={events}
+          events={allEvents}
           currentDate={currentDate}
           onEventClick={handleEventClick}
         />
@@ -207,7 +288,7 @@ const Calendar: React.FC = () => {
         />
         <CalendarGrid
           currentDate={currentDate}
-          events={events}
+          events={allEvents}
           onDateClick={handleDateClick}
           onEventClick={handleEventClick}
         />
