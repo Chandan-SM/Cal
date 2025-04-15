@@ -17,13 +17,21 @@ public class CalEventController {
         this.repository = repository;
     }
 
+    // Get all events (you might want to keep this for admin purposes)
     @GetMapping
     public List<CalEventDetails> getAll() {
         return repository.findAll();
     }
+    
+    // New endpoint to get events by userId
+    @GetMapping("/user/{userId}")
+    public List<CalEventDetails> getEventsByUserId(@PathVariable String userId) {
+        return repository.findByUserId(userId);
+    }
 
     @PostMapping
     public CalEventDetails createEntry(@RequestBody CalEventDetails eventDetail) {
+        // userId should be set in the request body from frontend
         return repository.save(eventDetail);
     }
 

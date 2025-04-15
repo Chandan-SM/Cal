@@ -18,6 +18,7 @@ public class CalEventDetails {
 
     private String time;
     private String category;
+    private String userId;
     
     public long getId() {
         return id;
@@ -54,6 +55,13 @@ public class CalEventDetails {
     }
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+    public void setUserID(String userId) {
+        this.userId = userId;
     }
 
     // Getters and Setters (same as current)
