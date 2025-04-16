@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CAL - Frontend
 
-## Getting Started
+Next.js frontend for the CAL calendar application.
 
-First, run the development server:
+## Features
+
+- **Interactive Calendar Interface** - Dynamic calendar with daily, weekly and monthly views
+- **Animated Components** - Smooth transitions and interactions
+- **Event Management** - Create, edit, and delete events with modal interfaces
+- **Responsive Design** - Works seamlessly across desktop and mobile devices
+- **Custom UI Components** - Tailored design system for calendar functionality
+
+## Directory Structure
+
+- `/src/app` - Page layouts and routing
+  - `layout.tsx` - Main application layout
+  - `page.tsx` - Main page component
+- `/src/components` - Reusable components
+  - `/ui` - Base UI elements
+  - `avatar.tsx` - User avatars
+  - `dropdown-menu.tsx` - Dropdown navigation
+  - `AnimatedCalendar.tsx` - Calendar with animations
+  - `Calendar.tsx` - Base calendar component
+  - `CalendarGrid.tsx` - Grid layout for calendar
+  - `CalendarHeader.tsx` - Header navigation for calendar
+  - `DayCell.tsx` - Individual day cell component
+  - `EventItem.tsx` - Event display component
+  - `EventModal.tsx` - Modal for creating/editing events
+  - `EventSideBar.tsx` - Sidebar for event details
+  - `nav-user.tsx` - User navigation component
+- `/src/lib` - Utility functions
+  - `calendarUtils.ts` - Calendar-specific helper functions
+  - `utils.ts` - General utility functions
+- `/src/services` - API communication
+  - `CalendarService.ts` - Service for calendar operations
+  - `middleware.ts` - Request handling middleware
+
+## Development Setup
+
+### Prerequisites
+- Node.js (v14.0+)
+- npm or yarn
+
+### Installation
+
+```bash
+# Install dependencies
+npm install
+# or
+yarn install
+
+# Create local environment file
+cp .env.example .env.local
+```
+
+### Environment Variables
+
+Configure the following variables in `.env.local`:
+
+```
+NEXT_PUBLIC_API_URL=http://localhost:8080
+# Add any other required environment variables
+```
+
+### Development Server
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The application will be available at `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Build for Production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+# or
+yarn build
+yarn start
+```
 
-## Learn More
+## Testing
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run test
+# or
+yarn test
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Linting
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run lint
+# or
+yarn lint
+```
 
-## Deploy on Vercel
+## Contributing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Please ensure all new components follow the existing patterns and include appropriate tests.
