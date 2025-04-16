@@ -125,11 +125,11 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   const weekdays = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
 
   return (
-    <div className="calendar-grid">
+    <div className="calendar-grid border border-indigo-900/30 p-5 rounded-2xl bg-slate-900/50 backdrop-blur-sm shadow-lg shadow-indigo-500/10">
       {/* Weekday headers */}
-      <div className="grid grid-cols-7 mb-4">
+      <div className="grid grid-cols-7 mb-4 gap-2">
         {weekdays.map(day => (
-          <div key={day} className="text-center font-medium text-gray-400 text-xs tracking-wider py-2">
+          <div key={day} className="text-center font-medium text-indigo-300 text-xs tracking-wider py-2 bg-slate-800/50 backdrop-blur-sm border border-indigo-900/20 rounded-md">
             {day}
           </div>
         ))}

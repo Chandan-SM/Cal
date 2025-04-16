@@ -15,7 +15,7 @@ export const metadata = {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className="h-screen bg-gray-900 text-gray-100">
+      <body className="h-screen text-slate-100 bg-slate-950">
         <ClerkProvider>
           {children}
         </ClerkProvider>

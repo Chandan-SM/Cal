@@ -270,7 +270,7 @@ const Calendar: React.FC = () => {
   };
 
   return (
-    <div className="flex w-full h-full">
+    <div className="flex w-full h-full bg-slate-950">
       <div className="hidden lg:block h-[100vh] lg:w-[250px] xl:w-[300px] scrollbar-none">
         <EventSidebar
           events={allEvents}
@@ -279,7 +279,7 @@ const Calendar: React.FC = () => {
         />
       </div>
 
-      <div className="flex-2 p-8 overflow-auto">
+      <div className="flex-2 p-7 overflow-auto">
         <CalendarHeader
           currentDate={currentDate}
           onPrevMonth={prevMonth}

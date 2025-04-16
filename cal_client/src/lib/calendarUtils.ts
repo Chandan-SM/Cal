@@ -1,125 +1,106 @@
 // lib/calendarUtils.ts
+import { format, isEqual, startOfDay } from 'date-fns';
 
 /**
- * Get the number of days in a specific month
+ * Format a date according to the specified format
+ * @param date The date to format
+ * @param formatType The type of format to use: 'full', 'short', or custom format string
+ * @returns The formatted date string
  */
-export const getDaysInMonth = (year: number, month: number): number => {
-    return new Date(year, month + 1, 0).getDate();
-};
-
-/**
- * Get the day of the week for the first day of the month
- * (0 = Sunday, 1 = Monday, etc.)
- */
-export const getFirstDayOfMonth = (year: number, month: number): number => {
-    return new Date(year, month, 1).getDay();
-};
-
-/**
- * Get an array of dates for the previous month that should appear in the calendar
- */
-export const getPreviousMonthDates = (year: number, month: number): Date[] => {
-    const firstDayOfMonth = getFirstDayOfMonth(year, month);
-    if (firstDayOfMonth === 0) return []; // Sunday, no previous month dates needed
-
-    const previousMonth = month === 0 ? 11 : month - 1;
-    const previousMonthYear = month === 0 ? year - 1 : year;
-    const daysInPreviousMonth = getDaysInMonth(previousMonthYear, previousMonth);
-
-    const dates: Date[] = [];
-    for (let i = 0; i < firstDayOfMonth; i++) {
-        const day = daysInPreviousMonth - firstDayOfMonth + i + 1;
-        dates.push(new Date(previousMonthYear, previousMonth, day));
-    }
-
-    return dates;
-};
-
-/**
- * Get an array of dates for the current month
- */
-export const getCurrentMonthDates = (year: number, month: number): Date[] => {
-    const daysInMonth = getDaysInMonth(year, month);
-    const dates: Date[] = [];
-
-    for (let day = 1; day <= daysInMonth; day++) {
-        dates.push(new Date(year, month, day));
-    }
-
-    return dates;
-};
-
-/**
- * Get an array of dates for the next month that should appear in the calendar
- */
-export const getNextMonthDates = (
-    year: number,
-    month: number,
-    currentMonthDates: Date[],
-    previousMonthDates: Date[]
-): Date[] => {
-    const totalDaysDisplayed = currentMonthDates.length + previousMonthDates.length;
-    const daysNeeded = 42 - totalDaysDisplayed; // 6 rows of 7 days = 42 cells
-
-    if (daysNeeded <= 0) return [];
-
-    const nextMonth = month === 11 ? 0 : month + 1;
-    const nextMonthYear = month === 11 ? year + 1 : year;
-
-    const dates: Date[] = [];
-    for (let day = 1; day <= daysNeeded; day++) {
-        dates.push(new Date(nextMonthYear, nextMonth, day));
-    }
-
-    return dates;
-};
-
-/**
- * Format a date to a readable string
- */
-export const formatDate = (date: Date | null, format: 'full' | 'short' | 'monthYear' = 'full'): string => {
-    if (!date) return '';
-
-    const options: Record<string, Intl.DateTimeFormatOptions> = {
-        full: {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-        },
-        short: {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-        },
-        monthYear: {
-            month: 'long',
-            year: 'numeric',
-        },
-    };
-
-    return date.toLocaleDateString('en-US', options[format] || options.full);
+export const formatDate = (date: Date, formatType: 'full' | 'short' | string = 'full'): string => {
+  const formatMap: Record<string, string> = {
+    full: 'EEEE, MMMM d, yyyy',
+    short: 'MMM d, yyyy',
+  };
+  
+  const formatString = formatMap[formatType] || formatType;
+  return format(date, formatString);
 };
 
 /**
  * Check if a date is today
+ * @param date The date to check
+ * @returns True if the date is today, false otherwise
  */
 export const isToday = (date: Date): boolean => {
-    const today = new Date();
-    return (
-        date.getDate() === today.getDate() &&
-        date.getMonth() === today.getMonth() &&
-        date.getFullYear() === today.getFullYear()
-    );
+  const today = new Date();
+  return isEqual(
+    startOfDay(date),
+    startOfDay(today)
+  );
 };
 
 /**
- * Check if two dates are the same day
+ * Get month name
+ * @param date The date
+ * @returns The month name
  */
-export const isSameDay = (date1: Date, date2: Date): boolean => {
-    return (
-        date1.getDate() === date2.getDate() &&
-        date1.getMonth() === date2.getMonth() &&
-        date1.getFullYear() === date2.getFullYear()
-    );
+export const getMonthName = (date: Date): string => {
+  return format(date, 'MMMM');
+};
+
+/**
+ * Get day name
+ * @param date The date
+ * @returns The day name
+ */
+export const getDayName = (date: Date): string => {
+  return format(date, 'EEEE');
+};
+
+/**
+ * Get a color for a category
+ * @param category The category name
+ * @returns CSS class for the category color
+ */
+export const getCategoryColor = (category?: string): string => {
+  const colors: Record<string, string> = {
+    work: 'bg-gradient-to-r from-violet-600 to-indigo-600 border-violet-400',
+    personal: 'bg-gradient-to-r from-teal-600 to-emerald-600 border-teal-400',
+    important: 'bg-gradient-to-r from-rose-600 to-pink-600 border-rose-400',
+    other: 'bg-gradient-to-r from-amber-600 to-orange-600 border-amber-400'
+  };
+  
+  return colors[category || 'other'] || colors.other;
+};
+
+/**
+ * Get text color for a category
+ * @param category The category name
+ * @returns CSS class for text color
+ */
+export const getCategoryTextColor = (category?: string): string => {
+  const colors: Record<string, string> = {
+    work: 'text-indigo-300',
+    personal: 'text-emerald-300',
+    important: 'text-rose-300',
+    other: 'text-amber-300'
+  };
+  
+  return colors[category || 'other'] || colors.other;
+};
+
+/**
+ * Get ring/border color for a category
+ * @param category The category name
+ * @returns CSS class for the ring/border color
+ */
+export const getCategoryRingColor = (category?: string): string => {
+  const colors: Record<string, string> = {
+    work: 'ring-indigo-500',
+    personal: 'ring-emerald-500',
+    important: 'ring-rose-500',
+    other: 'ring-amber-500'
+  };
+  
+  return colors[category || 'other'] || colors.other;
+};
+
+/**
+ * Format date for API requests
+ * @param date Date to format
+ * @returns Date formatted as YYYY-MM-DD
+ */
+export const formatDateForBackend = (date: Date): string => {
+  return format(date, 'yyyy-MM-dd');
 };
