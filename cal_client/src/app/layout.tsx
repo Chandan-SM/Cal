@@ -8,7 +8,7 @@ interface RootLayoutProps {
 
 // meta data
 export const metadata = {
-  title: "Cal",
+  title: "Kalyndr",
   description: "A modern Calendar Application",
 }
 

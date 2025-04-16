@@ -1,10 +1,10 @@
-# CAL - Modern Calendar Application
+# Kalyndr - Modern Calendar Application
 
 A full-stack calendar application designed to provide a streamlined event management experience with an intuitive interface.
 
 ## About
 
-CAL is a comprehensive calendar solution that enables users to manage events, schedule meetings, and organize their time effectively. With a responsive design and powerful features, CAL works seamlessly across devices to keep you organized.
+Kalyndr is a comprehensive calendar solution that enables users to manage events, schedule meetings, and organize their time effectively. With a responsive design and powerful features, Kalyndr works seamlessly across devices to keep you organized.
 
 ## Tech Stack
 
