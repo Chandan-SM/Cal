@@ -8,14 +8,14 @@ Kalyndr is a comprehensive calendar solution that enables users to manage events
 
 ## Tech Stack
 
-### Frontend (`cal_client`)
+### Frontend (`kalyndr_client`)
 - **Framework**: Next.js
 - **Language**: TypeScript
 - **UI Components**: Custom React components
 - **Styling**: PostCSS
 - **Linting**: ESLint
 
-### Backend (`cal_server`)
+### Backend (`kalyndr_server`)
 - **Framework**: Spring Boot
 - **Language**: Java
 - **Build Tool**: Maven
@@ -25,16 +25,16 @@ Kalyndr is a comprehensive calendar solution that enables users to manage events
 
 This repository is organized as a monorepo containing both frontend and backend code:
 
-- `/cal_client` - Next.js frontend application
-- `/cal_server` - Java Spring backend services
+- `/kalyndr_client` - Next.js frontend application
+- `/kalyndr_server` - Java Spring backend services
 
 Each directory contains its own README with specific setup instructions and details.
 
 ## Quick Start
 
 For detailed setup instructions, please refer to:
-- [Frontend Setup Guide](./cal_client/README.md)
-- [Backend Setup Guide](./cal_server/README.md)
+- [Frontend Setup Guide](./kalyndr_client/README.md)
+- [Backend Setup Guide](./kalyndr_server/README.md)
 
 ## License
 

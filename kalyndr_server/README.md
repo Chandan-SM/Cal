@@ -12,12 +12,12 @@ Java Spring Boot backend for the Kalyndr calendar application.
 
 ## Directory Structure
 
-- `/src/main/java/com/chandan/calApplication` - Main application code
+- `/src/main/java/com/chandan/kalyndrApplication` - Main application code
   - `/config` - Application configuration
   - `/controller` - API endpoints
   - `/entity` - Data models
   - `/repository` - Data access layer
-  - `CalApplication.java` - Application entry point
+  - `KalyndrApplication.java` - Application entry point
 - `/src/main/resources` - Configuration files and static resources
 - `/src/test` - Test classes
 
@@ -41,7 +41,7 @@ Configure the following variables in `.env` or application properties:
 
 ```
 # Database Configuration
-SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/cal_db
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/kalyndr_db
 SPRING_DATASOURCE_USERNAME=root
 SPRING_DATASOURCE_PASSWORD=password
 
@@ -58,7 +58,7 @@ SERVER_PORT=8080
 mvn spring-boot:run
 
 # Or run the JAR directly
-java -jar target/calApplication.jar
+java -jar target/kalyndrApplication.jar
 ```
 
 The API will be available at `http://localhost:8080`.
