@@ -1,6 +1,6 @@
-# CAL - Frontend
+# Kalyndr - Frontend
 
-Next.js frontend for the CAL calendar application.
+Next.js frontend for the Kalyndr calendar application.
 
 ## Features
 
