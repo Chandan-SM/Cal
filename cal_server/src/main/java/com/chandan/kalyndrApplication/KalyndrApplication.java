@@ -1,10 +1,10 @@
-package com.chandan.calApplication;
+package com.chandan.kalyndrApplication;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CalApplication {
+public class KalyndrApplication {
 
     public static void main(String[] args) {
         // Load environment variables directly from the system (Render automatically injects them)
@@ -28,6 +28,6 @@ public class CalApplication {
         System.setProperty("dbPort", dbPort);
 
         // Start the Spring Boot application
-        SpringApplication.run(CalApplication.class, args);
+        SpringApplication.run(KalyndrApplication.class, args);
     }
 }

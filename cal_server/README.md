@@ -1,6 +1,6 @@
-# CAL - Backend
+# Kalyndr - Backend
 
-Java Spring Boot backend for the CAL calendar application.
+Java Spring Boot backend for the Kalyndr calendar application.
 
 ## Features
 

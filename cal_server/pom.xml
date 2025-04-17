@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.chandan</groupId>
-	<artifactId>calApplication</artifactId>
+	<artifactId>kalyndrApplication</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Cal Application</name>
-	<description>User Specific Calendar Application</description>
+	<name>Kalyndr Application</name>
+	<description>A modern user specific Calendar Application</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -56,12 +56,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>io.github.cdimascio</groupId>
-			<artifactId>dotenv-java</artifactId>
-			<version>3.0.0</version>
 		</dependency>
 	</dependencies>
 

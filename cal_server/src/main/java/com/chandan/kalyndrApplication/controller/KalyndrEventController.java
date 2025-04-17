@@ -1,42 +1,43 @@
-package com.chandan.calApplication.controller;
+package com.chandan.kalyndrApplication.controller;
 
-import com.chandan.calApplication.entity.CalEventDetails;
-import com.chandan.calApplication.repository.CalEventRepository;
 import org.springframework.web.bind.annotation.*;
+
+import com.chandan.kalyndrApplication.entity.KalyndrEventDetails;
+import com.chandan.kalyndrApplication.repository.KalyndrEventRepository;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/calendar")
 @CrossOrigin(origins = "*")
-public class CalEventController {
+public class KalyndrEventController {
 
-    private final CalEventRepository repository;
+    private final KalyndrEventRepository repository;
 
-    public CalEventController(CalEventRepository repository) {
+    public KalyndrEventController(KalyndrEventRepository repository) {
         this.repository = repository;
     }
 
     // Get all events (you might want to keep this for admin purposes)
     @GetMapping
-    public List<CalEventDetails> getAll() {
+    public List<KalyndrEventDetails> getAll() {
         return repository.findAll();
     }
     
     // New endpoint to get events by userId
     @GetMapping("/user/{userId}")
-    public List<CalEventDetails> getEventsByUserId(@PathVariable String userId) {
+    public List<KalyndrEventDetails> getEventsByUserId(@PathVariable String userId) {
         return repository.findByUserId(userId);
     }
 
     @PostMapping
-    public CalEventDetails createEntry(@RequestBody CalEventDetails eventDetail) {
+    public KalyndrEventDetails createEntry(@RequestBody KalyndrEventDetails eventDetail) {
         // userId should be set in the request body from frontend
         return repository.save(eventDetail);
     }
 
     @GetMapping("/id/{id}")
-    public CalEventDetails getCalEntryById(@PathVariable Long id) {
+    public KalyndrEventDetails getCalEntryById(@PathVariable Long id) {
         return repository.findById(id).orElse(null);
     }
 
@@ -46,7 +47,7 @@ public class CalEventController {
     }
 
     @PutMapping("/id/{id}")
-    public CalEventDetails updateCalEntryById(@PathVariable Long id, @RequestBody CalEventDetails updated) {
+    public KalyndrEventDetails updateCalEntryById(@PathVariable Long id, @RequestBody KalyndrEventDetails updated) {
         updated.setId(id);
         return repository.save(updated);
     }

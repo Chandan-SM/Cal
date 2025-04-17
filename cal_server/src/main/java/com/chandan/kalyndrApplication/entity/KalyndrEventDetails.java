@@ -1,10 +1,10 @@
-package com.chandan.calApplication.entity;
+package com.chandan.kalyndrApplication.entity;
 
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "cal_event_details")
-public class CalEventDetails {
+public class KalyndrEventDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
