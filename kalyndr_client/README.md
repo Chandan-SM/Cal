@@ -17,8 +17,8 @@ Next.js frontend for the Kalyndr calendar application.
   - `page.tsx` - Main page component
 - `/src/components` - Reusable components
   - `/ui` - Base UI elements
-  - `avatar.tsx` - User avatars
-  - `dropdown-menu.tsx` - Dropdown navigation
+    - `avatar.tsx` - User avatars
+    - `dropdown-menu.tsx` - Dropdown navigation
   - `AnimatedCalendar.tsx` - Calendar with animations
   - `Calendar.tsx` - Base calendar component
   - `CalendarGrid.tsx` - Grid layout for calendar
